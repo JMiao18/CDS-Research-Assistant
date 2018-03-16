@@ -1,0 +1,304 @@
+---
+title: "Default and Endorsement"
+author: "Jin Miao"
+date: ''
+output:
+  html_document: default
+  
+---
+#Summary 
+*(each item is following their corresponding result table)*:
+
+1. Compared with non-default, the proportion of choosing 1 in the Default group is significantly higher.
+
+2. Both social endorsement and company endorsement have signficant positive effects on the probability of choosing 1. 
+
+3. EndorsementCondition does not have any significant effects on both choice and defaultchoice. 
+
+4. Baltho has significant effect on choice while the effect of smrd on choice is insignificant.
+
+5. baltho and smrd do not depend on default setting.
+
+6. Reverse to Summary 4, Baltho has insignificant effect on choice while the effect of smrd on choice is significant.
+
+7. Covariates: the number of children has highly significant effect on choice. BMI and Money are also significant. 
+
+8. Covariates: Age and Gender have significant effects on defaultchoice. 
+
+9. Type has significant main effect on baltho while default and the interaction between type and baltho are insignificant. 
+
+10. For the “Forced” dataset, there is no significant effect of default on baltho. 
+
+## •	regress the default column -> choice column (and make a bar graph of this). 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'}
+library("texreg")
+data = readRDS(file="M:/A Master of Science in Marketing Sciences/CDC Research Assistant/HealthScreening2_1.rds")
+attach(data)
+defaultchoice = as.numeric(defaultchoice)
+model1 = lm(choice~default)
+texreg::htmlreg(l = model1, center = TRUE, stars = c(0.001, 0.01, 0.05, 0.1),bold = 0.1, caption = "Model 1", caption.above = TRUE, digits = 4)
+```
+
+**1. Compared with non-default, the proportion of choosing 1 in the Default group is significantly higher.**
+
+```{r, echo=FALSE}
+counts <- table(data$choice,data$default)
+barplot(counts, main="Barplot for Default versus Choice",
+        xlab="default", col=c("darkblue","red"),
+        ylim=c(0,1000))
+legend("topright", legend = c("choice = 0","choice = 1"), fill = c("darkblue","red"))
+```
+
+##•	regress socialendorsement and company endorsement -> choice (look at them both in individual models and in the same model)
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'}
+socialendorsement = as.numeric(socialendorsement)
+companyendorsement = as.numeric(companyendorsement)
+
+model2 = lm(choice~socialendorsement)
+model3 = lm(choice~companyendorsement)
+model4 = lm(choice~socialendorsement + companyendorsement)
+texreg::htmlreg(l = list(model2, model3, model4), center = TRUE, stars = c(0.001, 0.01, 0.05, 0.1),bold = 0.1, caption = "Model 2-4", caption.above = TRUE, digits = 4)
+```
+
+## •	regress socialendorsement and company endorsement -> defaultchoice (look at them both in individual models and in the same model)
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'}
+
+defaultchoice = as.numeric(data$defaultchoice)
+model5 = lm(defaultchoice~socialendorsement)
+model6 = lm(defaultchoice~companyendorsement)
+model7 = lm(defaultchoice~socialendorsement + companyendorsement)
+texreg::htmlreg(l = list(model5, model6, model7), center = TRUE, stars = c(0.001, 0.01, 0.05, 0.1),bold = 0.1, caption = "Model 5-7", caption.above = TRUE, digits = 4)
+
+```
+
+**2. Both social endorsement and company endorsement have signficant positive effects on the probability of choosing 1.**
+
+## •	regress endorsementcondition -> choice 
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'}
+model8 = lm(choice~endorsementcondition)
+texreg::htmlreg(l = model8, center = TRUE, stars = c(0.001, 0.01, 0.05, 0.1),bold = 0.1, caption = "Model 8", caption.above = TRUE, digits = 4)
+```
+## •	regress endorsementcondition-> defaultchoice 
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'}
+model9 = lm(defaultchoice~endorsementcondition)
+texreg::htmlreg(l = model9, center = TRUE, stars = c(0.001, 0.01, 0.05, 0.1),bold = 0.1, caption = "Model 9", caption.above = TRUE, digits = 4)
+```
+**3. EndorsementCondition does not have any significant effects on both choice and defaultchoice.**
+
+## •	subset the data based on the type column to only the "natural" observations. Then regress smrd -> choice, baltho -> choice
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'}
+natural = subset(data, type == "natural")
+attach(natural)
+smrd = as.numeric(smrd)
+baltho = as.numeric(baltho)
+defaultchoice = as.numeric(natural$defaultchoice)
+
+model10 = lm(choice~smrd)
+model11 = lm(choice~baltho)
+texreg::htmlreg(l = list(model10, model11), center = TRUE, stars = c(0.001, 0.01, 0.05, 0.1),bold = 0.1, caption = "Model 10-11", caption.above = TRUE, digits = 4)
+```
+
+**4. Baltho has significant effect on choice while the effect of smrd on choice is insignificant. The next regression confirms that baltho and smrd do not depend on default setting.**
+
+## Then regress default -> smrd, default -> baltho
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'}
+model12 = lm(smrd~natural$default)
+model13 = lm(baltho~natural$default)
+texreg::htmlreg(l = list(model12, model13), center = TRUE, stars = c(0.001, 0.01, 0.05, 0.1),bold = 0.1, caption = "Model 12-13", caption.above = TRUE, digits = 4)
+```
+**5. baltho and smrd do not depend on default setting.**
+
+## Then regress smrd-> defaultchoice, baltho -> defaultchoice
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'}
+model14 = lm(defaultchoice~smrd)
+model15 = lm(defaultchoice~baltho)
+texreg::htmlreg(l = list(model14, model15), center = TRUE, stars = c(0.001, 0.01, 0.05, 0.1),bold = 0.1, caption = "Model 14-15", caption.above = TRUE, digits = 4)
+```
+**6. Reverse to Summary 4, Baltho has insignificant effect on choice while the effect of smrd on choice is significant.**
+
+## •	Regress Race, Age, Gender, Ethnicity, Marital, Children, BMI, Exercise, Smoke,  Own Health, Family, Friend, Career, PersonalHealth, Money -> choice (all in one model, no interactions)
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'}
+attach(data)
+Age = as.numeric(data$Age)
+Gender = as.factor(data$Gender)
+Marital = as.factor(data$Marital)
+Children = as.numeric(data$Children)
+Ethnicity = as.factor(data$Ethnicity)
+## Education = as.factor(Education)
+Exercise = as.numeric(data$Exercise)
+## Should "Exercise" be as.numeic or as.factor?
+Smoke = as.factor(data$Smoke)
+Own_Health = as.numeric(data$Own_Health)
+## Should "OwnHealth" be as.numeic or as.factor?
+Family = as.numeric(data$Family)
+Friend = as.numeric(data$Friend)
+Career = as.numeric(data$Career)
+PersonalHealth = as.numeric(data$PersonalHealth)
+Money = as.numeric(data$Money)
+
+model16 = lm(choice~Race + Age + Gender + Marital + Children + Ethnicity + BMI + Exercise + Smoke + Own_Health + Family + Friend + Career + PersonalHealth + Money)
+texreg::htmlreg(l = model16, center = TRUE, stars = c(0.001, 0.01, 0.05, 0.1),bold = 0.1, caption = "Model 16", caption.above = TRUE, digits = 4)
+
+```
+**7. Covariates: the number of children has highly significant effect on choice. BMI and Money are also significant.**
+
+## •	Regress Race, Age, Gender, Ethnicity, Marital, Children, BMI, Exercise, Smoke,  Own Health, Family, Friend, Career, PersonalHealth, Money -> defaultchoice (all in one model, no interactions)
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'}
+model17 = lm(data$defaultchoice~ Race + Age + Gender + Marital + Children + Ethnicity + BMI + Exercise + Smoke + Own_Health + Family + Friend + Career + PersonalHealth + Money)
+texreg::htmlreg(l = model17, center = TRUE, stars = c(0.001, 0.01, 0.05, 0.1),bold = 0.1, caption = "Model 17", caption.above = TRUE, digits = 4)
+```
+**8. Covariates: Age and Gender have significant effects on defaultchoice.**
+
+## •	Regress type*default -> baltho 
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'}
+attach(data)
+data$baltho = as.numeric(data$baltho)
+type = as.factor(type)
+default = as.factor(default)
+model18 = lm(data$baltho~type + default + type * default)
+texreg::htmlreg(l = model18, center = TRUE, stars = c(0.001, 0.01, 0.05, 0.1),bold = 0.1, caption = "Model 18", caption.above = TRUE, digits = 4)
+```
+**9. Type has significant main effect on baltho while default and the interaction between type and baltho are insignificant.**
+
+## •	Subset data based on type column to only "forced" observations and do an anova comparing the baltho for the the default column. (so anova for default -> baltho). 
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis'}
+force = subset(data, type == "forced")
+attach(force)
+fit <- aov(baltho ~ default, data = force)
+```
+
+```{r chunkTest, echo=FALSE, results='asis', warning = FALSE}
+library(xtable)
+# Coefficients
+# print(fit, type = "html")
+# Analysis of variance.
+print(xtable(fit), type = "html")
+```
+**10. For the “Forced” dataset, there is no significant effect of default on baltho.**
+
+## •	bar graphs of all the demographics variables ##
+```{r,echo=FALSE,results='hide',message=FALSE}
+attach(data)
+```
+```{r, echo=FALSE, warning=FALSE}
+counts <- table(Race)
+barplot(counts, main="Race Distribution", xlab="Race")
+```
+
+```{r, echo=FALSE, warning=FALSE}
+counts <- table(Age)
+barplot(counts, main="Age Distribution", xlab="Age")
+```
+
+```{r, echo=FALSE, warning=FALSE}
+counts <- table(Gender)
+barplot(counts, main="Gender Distribution", xlab="Gender")
+```
+
+```{r, echo=FALSE, warning=FALSE}
+counts <- table(Ethnicity)
+barplot(counts, main="Ethnicity Distribution", xlab="Ethnicity")
+```
+
+```{r, echo=FALSE, warning=FALSE}
+counts <- table(Marital)
+barplot(counts, main="Marital Status Distribution", xlab="Marital Status")
+```
+
+```{r, echo=FALSE, warning=FALSE}
+counts <- table(Children)
+barplot(counts, main="Children Distribution", xlab="Number of Children")
+```
+
+```{r, echo=FALSE, warning=FALSE}
+counts <- table(BMI)
+barplot(counts, main="BMI Distribution", xlab="BMI")
+```
+
+```{r, echo=FALSE, warning=FALSE}
+counts <- table(Exercise)
+barplot(counts, main="Exercise Distribution", xlab="Exercise")
+```
+
+```{r, echo=FALSE, warning=FALSE}
+counts <- table(Smoke)
+barplot(counts, main="Smoke Distribution", xlab="Smoke")
+```
+
+```{r, echo=FALSE, warning=FALSE}
+counts <- table(Own_Health)
+barplot(counts, main="Own Health Distribution", xlab="Own health")
+```
+
+```{r, echo=FALSE, warning=FALSE}
+counts <- table(Family)
+barplot(counts, main="Family Distribution", xlab="Family")
+```
+
+```{r, echo=FALSE, warning=FALSE}
+counts <- table(Friend)
+barplot(counts, main="Friend Distribution", xlab="Friend")
+```
+
+```{r, echo=FALSE, warning=FALSE}
+counts <- table(Career)
+barplot(counts, main="Career Distribution", xlab="Career")
+```
+
+```{r, echo=FALSE, warning=FALSE}
+counts <- table(PersonalHealth)
+barplot(counts, main="Personal Health Distribution", xlab="Personal Health")
+```
+
+```{r, echo=FALSE, warning=FALSE}
+counts <- table(Money)
+barplot(counts, main="Money Distribution", xlab="Money")
+```
+
+## •	regress endorsement condition on social and company endorsement. 
+```{r, echo=FALSE, warning=FALSE, results = 'asis',message=FALSE}
+attach(data)
+model20 = lm(socialendorsement~endorsementcondition)
+model21 = lm(companyendorsement~endorsementcondition)
+texreg::htmlreg(l = list(model20,model21), center = TRUE, stars = c(0.001, 0.01, 0.05, 0.1),bold = 0.1, caption = "Model 20-21", caption.above = TRUE, digits = 4)
+```
+
+### 
+```{r, echo=FALSE, warning=FALSE, results = 'asis',message=FALSE}
+attach(natural)
+model22 = lm(smrd~as.factor(endorsementcondition),data = natural)
+model23 = lm(smrd~as.numeric(socialendorsement),data = natural)
+model24 = lm(smrd~as.numeric(companyendorsement),data = natural)
+model25 = lm(smrd~as.factor(endorsementcondition)+as.numeric(socialendorsement)+as.numeric(companyendorsement),data = natural)
+texreg::htmlreg(l = list(model22,model23,model24,model25), center = TRUE, stars = c(0.001, 0.01, 0.05, 0.1),bold = 0.1, caption = "Model 22-25", caption.above = TRUE, digits = 4)
+```
+
+### 
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis',message=FALSE}
+attach(natural)
+model26 = lm(baltho~as.factor(endorsementcondition),data = natural)
+model27 = lm(baltho~as.numeric(socialendorsement),data = natural)
+model28 = lm(baltho~as.numeric(companyendorsement),data = natural)
+model29 = lm(baltho~as.factor(endorsementcondition)+as.numeric(socialendorsement)+as.numeric(companyendorsement),data = natural)
+texreg::htmlreg(l = list(model26,model27,model28,model29), center = TRUE, stars = c(0.001, 0.01, 0.05, 0.1),bold = 0.1, caption = "Model 26-29", caption.above = TRUE, digits = 4)
+```
+
+## •	for the "forced" subset regressions of the endorsement variables on baltho
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results = 'asis',message=FALSE}
+attach(force)
+model30 = lm(baltho~as.factor(endorsementcondition),data = force)
+model31 = lm(baltho~as.numeric(socialendorsement),data = force)
+model32 = lm(baltho~as.numeric(companyendorsement),data = force)
+model33 = lm(baltho~as.factor(endorsementcondition)+as.numeric(socialendorsement)+as.numeric(companyendorsement),data = force)
+texreg::htmlreg(l = list(model30,model31,model32,model33), center = TRUE, stars = c(0.001, 0.01, 0.05, 0.1),bold = 0.1, caption = "Model 30-33", caption.above = TRUE, digits = 4)
+```
+
+
+
