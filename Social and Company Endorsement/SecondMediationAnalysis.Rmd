@@ -1,0 +1,155 @@
+---
+title: "SecondMediationAnalysis"
+author: "Jin Miao"
+date: "February 23, 2018"
+output: 
+  html_document:
+    code_folding: hide
+    highlight: haddock
+    theme: paper
+    toc: true
+    toc_depth: 3
+    toc_float: true
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+subtitle: Mediation & Climate
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r,message=FALSE,warning=FALSE}
+data = readRDS(file="M:/A Master of Science in Marketing Sciences/CDC Research Assistant/HealthManagement2.rds")
+attach(data)
+data$defaultchoice = as.numeric(data$defaultchoice)
+data$socialendorsement = as.numeric(data$socialendorsement)
+data$companyendorsement = as.numeric(data$companyendorsement)
+data$doctorendorsement = as.numeric(data$doctorendorsement)
+data$Age = as.numeric(data$Age)
+data$Gender = as.factor(data$Gender)
+data$Marital = as.factor(data$Marital)
+data$Children = as.numeric(data$Children)
+data$Ethnicity = as.factor(data$Ethnicity)
+data$Exercise = as.numeric(data$Exercise)
+data$Smoke = as.factor(data$Smoke)
+data$Own_Health = as.numeric(data$Own_Health)
+data$Family = as.numeric(data$Family)
+data$Friend = as.numeric(data$Friend)
+data$Career = as.numeric(data$Career)
+data$PersonalHealth = as.numeric(data$PersonalHealth)
+data$Money = as.numeric(data$Money)
+data$baltho = as.numeric(data$baltho)
+data$type = as.factor(data$type)
+data$default = as.factor(data$default)
+data$smrd = as.numeric(data$smrd)
+```
+
+#For the natural subset 
+##1. smrd mediating company endorsement on choice 
+```{r,warning=FALSE,message=FALSE}
+library(mediation)
+natural = subset(data, type == "natural")
+attach(natural)
+med.fit <- lm(smrd ~ companyendorsement, data = natural)
+out.fit <- glm(choice ~ smrd+ companyendorsement,data = natural, family = binomial("probit"))
+
+med.out_1 <- mediate(med.fit, out.fit, boot = TRUE, treat = "companyendorsement", mediator = "smrd", sims = 1000)
+
+summary(med.out_1)
+plot(med.out_1,main = "The Mediation Effect of smrd on companyendorsement")
+```
+
+
+##2. baltho mediating company endorsement on choice
+```{r,message=FALSE}
+med.fit <- lm(baltho ~ companyendorsement, data = natural)
+out.fit <- glm(choice ~ baltho+ companyendorsement,data = natural, family = binomial("probit"))
+
+med.out_2 <- mediate(med.fit, out.fit, boot = TRUE, treat = "companyendorsement", mediator = "baltho", sims = 1000)
+
+summary(med.out_2)
+plot(med.out_2,main = "The Mediation Effect of baltho on companyendorsement")
+```
+
+##3. smrd mediating social endorsement on choice 
+```{r,message=FALSE}
+med.fit <- lm(smrd ~ socialendorsement, data = natural)
+out.fit <- glm(choice ~ smrd+ socialendorsement,data = natural, family = binomial("probit"))
+
+med.out_3 <- mediate(med.fit, out.fit, boot = TRUE, treat = "socialendorsement", mediator = "smrd", sims = 1000)
+
+summary(med.out_3)
+plot(med.out_3,main = "The Mediation Effect of smrd on socialendorsement")
+```
+
+##4. baltho mediating social endorsement on choice 
+```{r,message=FALSE}
+med.fit <- lm(baltho ~ socialendorsement, data = natural)
+out.fit <- glm(choice ~ baltho+ socialendorsement,data = natural, family = binomial("probit"))
+
+med.out_4 <- mediate(med.fit, out.fit, boot = TRUE, treat = "socialendorsement", mediator = "baltho", sims = 1000)
+
+summary(med.out_4)
+plot(med.out_4,main = "The Mediation Effect of baltho on socialendorsement")
+```
+
+##5. smrd mediating doctor endorsement on choice 
+```{r,message=FALSE}
+med.fit <- lm(smrd ~ doctorendorsement, data = natural)
+out.fit <- glm(choice ~ smrd+ doctorendorsement,data = natural, family = binomial("probit"))
+
+med.out_5 <- mediate(med.fit, out.fit, boot = TRUE, treat = "doctorendorsement", mediator = "smrd", sims = 1000)
+
+summary(med.out_5)
+plot(med.out_5,main = "The Mediation Effect of smrd on doctorendorsement")
+```
+
+##6. baltho mediating doctor endorsement on choice 
+```{r,message=FALSE}
+med.fit <- lm(baltho ~ doctorendorsement, data = natural)
+out.fit <- glm(choice ~ baltho+ doctorendorsement,data = natural, family = binomial("probit"))
+
+med.out_6 <- mediate(med.fit, out.fit, boot = TRUE, treat = "doctorendorsement", mediator = "baltho", sims = 1000)
+
+summary(med.out_4)
+plot(med.out_4,main = "The Mediation Effect of baltho on doctorendorsement")
+```
+
+#For the total dataset
+##1. baltho mediating company endorsement on choice 
+```{r,message=FALSE}
+attach(data)
+med.fit <- lm(baltho ~ companyendorsement, data = data)
+out.fit <- glm(choice ~ baltho+ companyendorsement,data = data, family = binomial("probit"))
+
+med.out_7 <- mediate(med.fit, out.fit, boot = TRUE, treat = "companyendorsement", mediator = "baltho", sims = 1000)
+
+summary(med.out_6)
+plot(med.out_6,main = "The Mediation Effect of baltho on companyendorsement")
+```
+
+##2. baltho mediating social endorsement on choice 
+```{r,message=FALSE}
+attach(data)
+med.fit <- lm(baltho ~ socialendorsement, data = data)
+out.fit <- glm(choice ~ baltho+ socialendorsement,data = data, family = binomial("probit"))
+
+med.out_8 <- mediate(med.fit, out.fit, boot = TRUE, treat = "socialendorsement", mediator = "baltho", sims = 1000)
+
+summary(med.out_5)
+plot(med.out_5,main = "The Mediation Effect of baltho on socialendorsement")
+```
+
+##3. baltho mediating doctor endorsement on choice 
+```{r,message=FALSE}
+attach(data)
+med.fit <- lm(baltho ~ doctorendorsement, data = data)
+out.fit <- glm(choice ~ baltho+ doctorendorsement,data = data, family = binomial("probit"))
+
+med.out_9 <- mediate(med.fit, out.fit, boot = TRUE, treat = "doctorendorsement", mediator = "baltho", sims = 1000)
+
+summary(med.out_9)
+plot(med.out_9,main = "The Mediation Effect of baltho on doctorendorsement")
+```
