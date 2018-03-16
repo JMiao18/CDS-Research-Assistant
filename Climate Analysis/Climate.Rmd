@@ -1,0 +1,82 @@
+---
+title: Climate Mitigation Data Analysis 4
+author: Jin Miao 
+date: '`r Sys.Date()`'
+output: 
+  html_document:
+    code_folding: hide
+    highlight: haddock
+    theme: paper
+    toc: true
+    toc_depth: 3
+    toc_float: true
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+subtitle: Political 
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,cache = TRUE)
+```
+
+```{r, echo=FALSE, message=FALSE,warning=FALSE}
+
+data = read.csv(file = "M:/A Master of Science in Marketing Sciences/CDC Research Assistant/climate_mit_data_factor.csv", header = TRUE)
+attach(data)
+
+data$Tedious.comment = as.character(data$Tedious.comment)
+data$Confusing.comment = as.character(data$Confusing.comment)
+data$Additional.comment = as.character(data$Additional.comment)
+data$political[data$political == " "] = NA
+```
+
+#Correlations
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+library(lazyeval)
+library(scales)
+library(colorspace)
+library(Hmisc)
+
+corpearson = rcorr(cbind(political,Care,Fairness,Loyalty,Respect,Purity), type="pearson")
+
+corpearson
+```
+
+#PoliticalRegresions 
+
+```{r,echo=FALSE,warning=FALSE, message=FALSE, results = 'asis'}
+model1 = lm(Factor1~political*Feasibility*Consequences*Co_benefits,data = na.omit(data))
+texreg::htmlreg(l = model1, center = TRUE, stars = c(0.001, 0.01, 0.05, 0.1),bold = 0.1, caption = "political*feasibility*consequences * co_benefits -> Factor 1 ", caption.above = TRUE, digits = 4)
+```
+
+```{r,echo=FALSE,warning=FALSE, message=FALSE, results = 'asis'}
+model2 = lm(Factor1~political+Feasibility*Consequences*Co_benefits,data = na.omit(data))
+texreg::htmlreg(l = model2, center = TRUE, stars = c(0.001, 0.01, 0.05, 0.1),bold = 0.1, caption = "political + feasibility * consequences * co_benefits -> Factor 1", caption.above = TRUE, digits = 4)
+```
+
+#Splom 
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+library(plyr)
+library(dplyr)
+library(stringr)
+library(reshape2)
+library(ggplot2)
+library(psych)
+library(tcltk)
+library(LMERConvenienceFunctions)
+library(GGally)
+library(survival)
+library(RODBC)
+
+library(decider)
+mj = c("political","Care","Fairness","Loyalty","Respect","Purity")
+index = c()
+for (i in 1:length(mj))
+{
+  name = mj[i]
+  index = cbind(index,grep(name, colnames(data)) )
+}
+splom_CDS(data[, index],plotTitle = "scatterplot matrix for political, care, fairness, loyalty, respect and purity")
+```
